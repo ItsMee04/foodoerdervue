@@ -39,6 +39,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::patch('update-item/{id}', [ItemController::class, 'update'])->middleware(['ableCreateUpdateItem']);
     Route::get('delete-item/{id}', [ItemController::class, 'delete'])->middleware(['ableCreateUpdateItem']);
 
+    Route::get('order', [OrderController::class, 'index'])->middleware(['ableCreateOrder']);
     Route::post('create-order', [OrderController::class, 'store'])->middleware(['ableCreateOrder']);
     Route::get('order-detail/{id}', [OrderController::class, 'OrderDetail'])->middleware(['ableCreateOrder']);
 });

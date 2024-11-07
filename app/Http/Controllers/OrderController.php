@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
+    public function index()
+    {
+        $order = Order::all();
+        return response()->json(['success' => true, 'message' => 'Data Ditemukan', 'data' => $order]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -57,6 +63,6 @@ class OrderController extends Controller
     {
         $order  = Order::findOrFail($id);
 
-        return response()->json(['success' => true, 'message' => 'Data Ditambahkan', 'data' => $order->sumOrderPrice()]);
+        return response()->json(['success' => true, 'message' => 'Data Ditambahkan', 'data' => $order->loadMissing(['orderDetail:order_id,price', 'OrderDetail.item:id,name,image', 'user:id,name', 'User.role:id,name'])]);
     }
 }
