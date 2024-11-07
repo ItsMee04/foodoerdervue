@@ -9,13 +9,19 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use PhpParser\Node\Expr\FuncCall;
 
 class OrderController extends Controller
 {
     public function index()
     {
         $order = Order::all();
-        return response()->json(['success' => true, 'message' => 'Data Ditemukan', 'data' => $order]);
+
+        if ($order->isEmpty()) {
+            return response()->json(['success' => true, 'message' => 'Data Tidak Ada']);
+        } else {
+            return response()->json(['success' => true, 'message' => 'Data Ditemukan', 'data' => $order]);
+        }
     }
 
     public function store(Request $request)
@@ -64,6 +70,30 @@ class OrderController extends Controller
         $order  = Order::findOrFail($id);
 
         return response()->json(['success' => true, 'message' => 'Data Ditambahkan', 'data' => $order->loadMissing(['orderDetail:order_id,price', 'OrderDetail.item:id,name,image', 'user:id,name', 'User.role:id,name'])]);
+    }
+
+    public function cancelOrder($id)
+    {
+        $order  = Order::findOrFail($id);
+        $item   = OrderDetail::where('order_id', $id)->first();
+
+        if ($order->status != "Ordered") {
+            return response()->json(['errors' => true, 'message' => 'You cannot set done because status is not ORDERED']);
+        }
+
+        // Mengubah status order menjadi 'Cancel'
+        $order->status = "Cancel";
+        $order->save();
+
+        // Hapus detail pesanan jika ada
+        if ($item) {
+            OrderDetail::where('order_id', $id)->delete();
+        }
+
+        // Hapus order
+        $order->delete();
+
+        return response()->json(['success' => true, 'message' => 'Order Dibatalkan']);
     }
 
     public function setAsDone($id)

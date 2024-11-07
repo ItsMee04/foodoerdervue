@@ -28,7 +28,12 @@ class ItemController extends Controller
         unset($item->created_at);
         unset($item->updated_at);
         unset($item->deleted_at);
-        return response()->json(['success' => true, 'message' => 'Data Ditemukan', 'data' => $item]);
+
+        if ($item->isEmpty()) {
+            return response()->json(['success' => true, 'message' => 'Data Tidak Ada']);
+        } else {
+            return response()->json(['success' => true, 'message' => 'Data Ditemukan', 'data' => $item]);
+        }
     }
 
     public function store(Request $request)
@@ -59,7 +64,7 @@ class ItemController extends Controller
     {
         $item = Item::findOrFail($id);
 
-        return response()->json(['success' => true, 'message' => 'Data Ditambahkan', 'data' => $item]);
+        return response()->json(['success' => true, 'message' => 'Data Ditemukan', 'data' => $item]);
     }
 
     public function update(Request $request, $id)
@@ -98,6 +103,13 @@ class ItemController extends Controller
     public function delete($id)
     {
         $item = Item::findOrFail($id);
+
+        $path     = 'storage/items/' . $item->image;
+
+        if (File::exists($path)) {
+            File::delete($path);
+        }
+
         $item->delete();
 
         return response()->json(['success' => true, 'message' => 'Data Dihapus']);

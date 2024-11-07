@@ -34,11 +34,18 @@ class AuthController extends Controller
         unset($user->updated_at);
         unset($user->deleted_at);
 
-        return response()->json(['success' => true, 'message' => 'Login Sukses', 'data' => $user]);
+        return response()->json(['success' => true, 'message' => 'Login Success', 'data' => $user]);
     }
 
     public function me()
     {
         return response()->json(['success' => true, 'data' => Auth::user()]);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Successfully logged out']);
     }
 }
