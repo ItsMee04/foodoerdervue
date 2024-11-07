@@ -2,15 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use App\Models\Item;
-use Illuminate\Contracts\Cache\Store;
-use Illuminate\Http\File;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class ItemController extends Controller
 {
+    public function generateRandomCode()
+    {
+        $length = 10;
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomCode = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $randomCode .= $characters[rand(0, $charactersLength - 1)];
+        }
+
+        return $randomCode;
+    }
+
+    public function index()
+    {
+        $item = Item::all();
+        unset($item->created_at);
+        unset($item->updated_at);
+        unset($item->deleted_at);
+        return response()->json(['success' => true, 'message' => 'Data Ditemukan', 'data' => $item]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -19,18 +39,25 @@ class ItemController extends Controller
             'image_file'    =>  'nullable|mimes:png,jpg',
         ]);
 
-        if ($request->file('image_file')) {
-            $file = $request->file('image_file');
-            $fileName = $file->getClientOriginalName();
-            $newFileName = Carbon::now()->format("Y-m-d") . " " . $fileName;
-            $path = Storage::putFileAs('items', $file, $newFileName);
+        $randomCode = $this->generateRandomCode();
 
-            $request['image'] = $newFileName;
+        if ($request->file('image_file')) {
+            $extension = $request->file('image_file')->getClientOriginalExtension();
+            $fileName = $randomCode . '.' . $extension;
+            $request->file('image_file')->storeAs('items', $fileName);
+            $request['image'] = $fileName;
         }
         $item = Item::create($request->all());
         unset($item->created_at);
         unset($item->updated_at);
         unset($item->deleted_at);
+
+        return response()->json(['success' => true, 'message' => 'Data Ditambahkan', 'data' => $item]);
+    }
+
+    public function show($id)
+    {
+        $item = Item::findOrFail($id);
 
         return response()->json(['success' => true, 'message' => 'Data Ditambahkan', 'data' => $item]);
     }
@@ -45,17 +72,19 @@ class ItemController extends Controller
 
         $item = Item::findOrFail($id);
 
+        $randomCode = $this->generateRandomCode();
+
         if ($request->hasFile('image_file')) {
-            if ($item->image) {
-                Storage::disk('public')->delete($item->image);
+            $path     = 'storage/items/' . $item->image;
+
+            if (File::exists($path)) {
+                File::delete($path);
             }
 
-            $file = $request->file('image_file');
-            $fileName = $file->getClientOriginalName();
-            $newFileName = Carbon::now()->format("Y-m-d") . " " . $fileName;
-            $path = Storage::putFileAs('items', $file, $newFileName);
-
-            $request['image'] = $newFileName;
+            $extension = $request->file('image_file')->getClientOriginalExtension();
+            $fileName = $randomCode . '.' . $extension;
+            $request->file('image_file')->storeAs('items', $fileName);
+            $request['image'] = $fileName;
         }
 
         $item->update($request->all());
@@ -64,5 +93,13 @@ class ItemController extends Controller
         unset($item->deleted_at);
 
         return response()->json(['success' => true, 'message' => 'Data Diupdate', 'data' => $item]);
+    }
+
+    public function delete($id)
+    {
+        $item = Item::findOrFail($id);
+        $item->delete();
+
+        return response()->json(['success' => true, 'message' => 'Data Dihapus']);
     }
 }
