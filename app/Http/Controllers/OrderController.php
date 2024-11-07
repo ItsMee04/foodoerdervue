@@ -65,4 +65,32 @@ class OrderController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Data Ditambahkan', 'data' => $order->loadMissing(['orderDetail:order_id,price', 'OrderDetail.item:id,name,image', 'user:id,name', 'User.role:id,name'])]);
     }
+
+    public function setAsDone($id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->status != "Ordered") {
+            return response()->json(['errors' => true, 'message', 'you cannot set done because status is not ORDERED']);
+        }
+
+        $order->status = 'Done';
+        $order->save();
+
+        return response()->json(['success' => true, 'message' => 'Pesanan Sudah Done', 'data' => $order]);
+    }
+
+    public function payOder($id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->status != "Done") {
+            return response()->json(['errors' => true, 'message', 'you cannot finish order because status is not Done']);
+        }
+
+        $order->status = 'Paid';
+        $order->save();
+
+        return response()->json(['success' => true, 'message' => 'Order paid successfully', 'data' => $order]);
+    }
 }

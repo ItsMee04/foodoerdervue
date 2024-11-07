@@ -42,4 +42,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('order', [OrderController::class, 'index'])->middleware(['ableCreateOrder']);
     Route::post('create-order', [OrderController::class, 'store'])->middleware(['ableCreateOrder']);
     Route::get('order-detail/{id}', [OrderController::class, 'OrderDetail'])->middleware(['ableCreateOrder']);
+
+    Route::get('order/{id}/done', [OrderController::class, 'setAsDone'])->middleware(['ableFinishOrder']);
+    Route::get('order/{id}/payment', [OrderController::class, 'payOder'])->middleware(['ablePayOrder']);
 });
