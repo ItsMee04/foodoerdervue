@@ -18,9 +18,9 @@ class OrderController extends Controller
         $order = Order::all();
 
         if ($order->isEmpty()) {
-            return response()->json(['success' => true, 'message' => 'Data Tidak Ada']);
+            return response()->json(['success' => true, 'message' => 'Data not fonud']);
         } else {
-            return response()->json(['success' => true, 'message' => 'Data Ditemukan', 'data' => $order]);
+            return response()->json(['success' => true, 'message' => 'Data successfully found', 'data' => $order]);
         }
     }
 
@@ -62,14 +62,14 @@ class OrderController extends Controller
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
 
-        return response()->json(['success' => true, 'message' => 'Data Ditambahkan', 'data' => $order]);
+        return response()->json(['success' => true, 'message' => 'Data added successfully', 'data' => $order]);
     }
 
     public function OrderDetail($id)
     {
         $order  = Order::findOrFail($id);
 
-        return response()->json(['success' => true, 'message' => 'Data Ditambahkan', 'data' => $order->loadMissing(['orderDetail:order_id,price', 'OrderDetail.item:id,name,image', 'user:id,name', 'User.role:id,name'])]);
+        return response()->json(['success' => true, 'message' => 'Data successfully found ', 'data' => $order->loadMissing(['orderDetail:order_id,price', 'OrderDetail.item:id,name,image', 'user:id,name', 'User.role:id,name'])]);
     }
 
     public function cancelOrder($id)
@@ -93,7 +93,7 @@ class OrderController extends Controller
         // Hapus order
         $order->delete();
 
-        return response()->json(['success' => true, 'message' => 'Order Dibatalkan']);
+        return response()->json(['success' => true, 'message' => 'Order cancelled successfully']);
     }
 
     public function setAsDone($id)
@@ -107,7 +107,7 @@ class OrderController extends Controller
         $order->status = 'Done';
         $order->save();
 
-        return response()->json(['success' => true, 'message' => 'Pesanan Sudah Done', 'data' => $order]);
+        return response()->json(['success' => true, 'message' => 'Order done successfully', 'data' => $order]);
     }
 
     public function payOder($id)

@@ -30,9 +30,9 @@ class ItemController extends Controller
         unset($item->deleted_at);
 
         if ($item->isEmpty()) {
-            return response()->json(['success' => true, 'message' => 'Data Tidak Ada']);
+            return response()->json(['success' => true, 'message' => 'Data not found']);
         } else {
-            return response()->json(['success' => true, 'message' => 'Data Ditemukan', 'data' => $item]);
+            return response()->json(['success' => true, 'message' => 'Data successfully found', 'data' => $item]);
         }
     }
 
@@ -57,14 +57,14 @@ class ItemController extends Controller
         unset($item->updated_at);
         unset($item->deleted_at);
 
-        return response()->json(['success' => true, 'message' => 'Data Ditambahkan', 'data' => $item]);
+        return response()->json(['success' => true, 'message' => 'Data added successfully', 'data' => $item]);
     }
 
     public function show($id)
     {
         $item = Item::findOrFail($id);
 
-        return response()->json(['success' => true, 'message' => 'Data Ditemukan', 'data' => $item]);
+        return response()->json(['success' => true, 'message' => 'Data added successfully', 'data' => $item]);
     }
 
     public function update(Request $request, $id)
@@ -97,7 +97,7 @@ class ItemController extends Controller
         unset($item->updated_at);
         unset($item->deleted_at);
 
-        return response()->json(['success' => true, 'message' => 'Data Diupdate', 'data' => $item]);
+        return response()->json(['success' => true, 'message' => 'Data updated successfully', 'data' => $item]);
     }
 
     public function delete($id)
@@ -112,6 +112,6 @@ class ItemController extends Controller
 
         $item->delete();
 
-        return response()->json(['success' => true, 'message' => 'Data Dihapus']);
+        return response()->json(['success' => true, 'message' => 'Data deleted successfully']);
     }
 }

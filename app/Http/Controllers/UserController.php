@@ -25,6 +25,6 @@ class UserController extends Controller
         unset($user->created_at);
         unset($user->updated_at);
         unset($user->deleted_at);
-        return response()->json(['success' => true, 'message' => 'Data Ditambahkan', 'data' => $user]);
+        return response()->json(['success' => true, 'message' => 'Data added successfully', 'data' => $user]);
     }
 }
